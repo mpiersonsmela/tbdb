@@ -1,0 +1,21 @@
+name: tbdb
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - conda
+  - conda-env
+  - conda-build
+  - conda-verify
+  - python=3.7
+  - python.app
+  - _ipyw_jlab_nb_ext_conf
+  - anaconda==2019.10=py37_0
+  - anaconda-navigator
+  - navigator-updater
+  - biopython
+  - infernal=1.1.2
+  - viennarna
+  - trnascan-se
+  - locarna
