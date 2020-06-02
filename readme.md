@@ -26,7 +26,9 @@ For more information see: https://www.ncbi.nlm.nih.gov/account/
 ### Dependencies
 Dependencies are listed in `environment.yml`.
 
-A script `init.sh` is provided to install them automatically using conda.
+A script `init.sh` is provided to install them automatically using `conda`.
+
+You can also manually initialize by installing dependencies, then unzipping all '.tar.gz' files in the '/pipeline' subdirectory, and creating '/pipeline/tempfiles'
 
 Code was designed and tested on OSX 10.14; other Unix operating systems should also work but have not been tested.
 
