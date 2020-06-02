@@ -9,6 +9,7 @@ tar xzf LUTs.tar.gz
 rm LUTs.tar.gz
 tar xzf tRNAscan.tar.gz
 rm tRNAscan.tar.gz
+mkdir -p tempfiles
 cd ..
 echo "Installing dependencies"
 conda init bash
