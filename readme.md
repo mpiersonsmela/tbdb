@@ -1,4 +1,4 @@
-# tbdb
+# tbox
 This repository hosts scripts for T-box feature prediction and annotation, as well as a database of annotated T-boxes.
 
 ## Downloading the database
