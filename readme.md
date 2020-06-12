@@ -43,3 +43,6 @@ where score is the INFERNAL score cutoff to use (see [INFERNAL manual](http://ed
 ## Translational T-box predictions
 With input.fa containing your sequences, run: `./tbox_translational.sh input.fa [optional score cutoff]`
 To generate an INFERNAL output from a genome file, run: `cmsearch --notrunc --notextw translational_ILE.cm output.txt`
+
+## Description of output fields 
+Descriptions for each of the output fields can be found in the 'Database Field Description.csv' file, located in this directory. 
