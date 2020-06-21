@@ -762,7 +762,18 @@ def trim(seq_df):
         t_struct = seq_df['whole_term_structure'][i]
         a_struct = seq_df['folded_antiterm_structure'][i]
     
-        if pd.isna(seq) or pd.isna(t_struct) or pd.isna(a_struct) or pd.isna(seq_df['antiterm_end'][i]):
+        if pd.isna(seq):
+            continue
+        if pd.isna(t_struct) or pd.isna(a_struct) or pd.isna(seq_df['antiterm_end'][i]):
+            #Fallback: only trim sequence
+            try:
+                tbox_start = int(seq_df['Tbox_start'][i])
+                #Slice fasta sequence to get the tbox sequence
+                seq = seq[tbox_start-1:]
+                seq_df.at[seq_df.index[i], 'Trimmed_sequence'] = seq
+                counter += 1
+            except:
+                pass
             continue
         
         tbox_start = int(seq_df['Tbox_start'][i])

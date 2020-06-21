@@ -30,7 +30,9 @@ python3 trna_refinement.py tempfiles/${output}_1.csv tempfiles/${output}_2.csv
 echo "Assigning codons"
 python3 add_aatrna.py tempfiles/${output}_2.csv tempfiles/${output}_3.csv
 echo "Filtering output"
-python3 tbox_pipeline_filter.py tempfiles/${output}_3.csv ${output}.csv
+python3 tbox_pipeline_filter.py tempfiles/${output}_3.csv ${output}_4.csv
+echo "Writing URLs for proteins"
+python3 add_protein_url.py tempfiles/${output}_4.csv ${output}.csv
 
 echo "Cleaning up"
 rm tempfiles/*
