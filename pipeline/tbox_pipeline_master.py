@@ -7,6 +7,8 @@ import sys
 import re
 import pandas as pd
 from Bio import SeqIO
+from Bio.Seq import Seq
+from Bio.Alphabet import generic_dna
 import subprocess
 
 #Function to read an INFERNAL output file and extract sequence names, metadata, structure, and sequence
@@ -246,14 +248,32 @@ def term_end(sequence, start, pattern = 'TTTTT'):
 #Note: tboxes must contain fasta sequences!
 def tbox_derive(tboxes):
     #Derive more features for visualization
+    #ALSO: Handle negative-strand T-boxes
 
-
-    for i, fasta in enumerate(tboxes['FASTA_sequence']):
+    for i in range(len(tboxes['FASTA_sequence'])):
+        fasta = tboxes['FASTA_sequence'][i]
         print('Mapping ' + tboxes['Name'][i]) #debug
         seq = tboxes['Sequence'][i]
         if isinstance(seq, str): #sanity check. Skip NaN
+            #Check if the T-box is on the NEGATIVE strand
+            if tboxes['Tbox_start'][i] > tboxes['Tbox_end'][i]:
+                print("Converting – strand to +: " + tboxes['Name'][i])
+                #Convert name
+                split_name = tboxes['Name'][i].split(':')
+                seq_start = split_name[1].split('-')[0]
+                seq_end = split_name[1].split('-')[1]
+                tboxes.at[tboxes.index[i], 'Name'] = split_name[0] + ':' + seq_end + '-' + seq_start
+                #Convert FASTA sequence
+                sequence = Seq(fasta, generic_dna)
+                tboxes.at[tboxes.index[i], 'FASTA_sequence'] = str(sequence.reverse_complement())
+                #Convert T-box start and end (since these are FASTA-relative)
+                #Other features, which are INFERNAL-relative, should not be converted yet
+                tboxes.at[tboxes.index[i], 'Tbox_start'] = len(fasta) - tboxes['Tbox_start'][i] + 1
+                tboxes.at[tboxes.index[i], 'Tbox_end'] = len(fasta) - tboxes['Tbox_end'][i] + 1
+                print("Conversion complete. New name is: " + tboxes['Name'][i])
+                
             #Create mapping between INFERNAL sequence and FASTA sequence
-            mapping = map_fasta(seq, fasta, offset = tboxes['Tbox_start'][i] - 1)
+            mapping = map_fasta(seq, tboxes['FASTA_sequence'][i], offset = tboxes['Tbox_start'][i] - 1)
             #Update the positions of existing features.
             s1_start = int(tboxes['s1_start'][i])
             if s1_start > 0:
@@ -292,7 +312,7 @@ def tbox_derive(tboxes):
                 aterm_end = min(aterm_end, len(mapping)-1)
                 tboxes.at[tboxes.index[i], 'antiterm_end'] = mapping[aterm_end]
                 #Calculate terminator end
-                tboxes.at[tboxes.index[i], 'term_end'] = term_end(fasta, aterm_end)
+                tboxes.at[tboxes.index[i], 'term_end'] = term_end(tboxes['FASTA_sequence'][i], aterm_end)
         
     return tboxes
 
