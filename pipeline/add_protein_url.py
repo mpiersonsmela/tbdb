@@ -14,7 +14,7 @@ def add_protein_url(proteinid_string):
         url = "https://www.ncbi.nlm.nih.gov/protein/"+proteinid
         id_short = "RefSeq: "+id_short
     elif proteinid_string.startswith('emb|'):
-        url = "https://www.ebi.ac.uk/ena/data/view/"+proteinid
+        url = "https://www.ebi.ac.uk/ena/browser/view/"+proteinid
         id_short = "ENA: "+id_short
     elif proteinid_string.startswith('dbj|'): 
         url = "http://getentry.ddbj.nig.ac.jp/getentry/dad/"+proteinid
