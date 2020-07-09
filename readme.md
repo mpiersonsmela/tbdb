@@ -16,7 +16,13 @@ Thermodynamic calculations on antiterminator and terminator folds are performed 
 For each T-box, the most likely codon within the specifier loop is chosen based on position relative to the loop end, with additional refinement using tRNA discriminator base and downstream gene ontology (where present). Alternative codon-frames, where found, are also presented.
 
 # Running your own predictions
-Code for running your own predictions is contained in the `/pipeline` and `/translational` subdirectories.
+Simplified code that can detect and annotate T-boxes in arbitrary DNA sequences is available through Bioconda. 
+
+`conda install -c bioconda tbox-scan`
+
+See https://github.com/mpiersonsmela/tbox-conda for more information.
+
+For advanced users who want to use downstream gene analysis and tRNA matching, code for running your own predictions is contained in the `/pipeline` and `/translational` subdirectories.
 
 ## First time setup
 *NOTE: Before running the pipeline, you MUST add your own email and NCBI API key to the `tbox_pipeline_postprocess.py`! Otherwise it will not work.*
