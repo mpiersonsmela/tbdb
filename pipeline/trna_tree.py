@@ -112,8 +112,8 @@ def check_disc_trna(genome_accession, codon, pr):
     temp_str=open('tempfiles/temp_str.txt','r').read().split('Str: ')[1].replace('>','(').replace('<',')')
     
     discrim = get_discrim(temp_seq, temp_str)
-    print('tRNA Discriminator base = '+discrim)
-    print('T-box Anti-Discriminator base = '+db)
+    #print('tRNA Discriminator base = '+discrim)
+    #print('T-box Anti-Discriminator base = '+db)
     return wobblepair(db, discrim)
     
 def check_trna(genome_accession, codon):
@@ -152,7 +152,7 @@ def trna_tree(infile, outfile):
             print('Currently on: '+str(i))
             
             for rf in range(0,3):
-                print("Reading frame: " + str(rf)) 
+                #print("Reading frame: " + str(rf)) 
                 codon=pr['codon_region'][rf:rf+3].replace('T','U')
                 
                 ######################################

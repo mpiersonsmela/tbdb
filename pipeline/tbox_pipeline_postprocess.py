@@ -17,8 +17,11 @@ import urllib.request
 #For more information see: https://www.ncbi.nlm.nih.gov/account/
 #You can also run without a key but this will be slower.
 
-Entrez.email = "YOUR_EMAIL" #Your email, required for Entrez
-Entrez.api_key = "YOUR_KEY" #Your API key
+#Entrez.email = "YOUR_EMAIL" #Your email, required for Entrez
+#Entrez.api_key = "YOUR_KEY" #Your API key
+
+Entrez.email = "mpiersonsmela@g.harvard.edu" #Your email, required for Entrez
+Entrez.api_key = '74bfe70556a253ea01278e6f558e91d87808'
 
 def add_accession(predseq):
     
@@ -444,7 +447,7 @@ def add_gene_desc(predseq):
 
     proteinLUT.to_csv(LUTfile, index = False, header = True)
     return predseq
-                    
+                  
 infile = pd.read_csv(sys.argv[1])
 
 infile = fix_name(infile)

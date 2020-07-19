@@ -35,7 +35,7 @@ def get_trna(genome_accession, codon):
     temp_seq=open('tempfiles/temp_seq.txt','r').read().split('Seq: ')[1]
     temp_str=open('tempfiles/temp_str.txt','r').read().split('Str: ')[1].replace('>','(').replace('<',')')
     
-    return temp_seq, temp_str
+    return temp_seq.strip(), temp_str.strip()
     
 def check_trna_file(genome_accession):
     trna_file='trnascan/'+genome_accession+'_struc.txt'
@@ -44,13 +44,10 @@ def check_trna_file(genome_accession):
 def check_trna(genome_accession, codon):
     trna_file='trnascan/'+genome_accession+'_struc.txt'
     anticodon=rc(codon).replace('U','T')
-    print(genome_accession)
-    print(anticodon)
 
     g1='grep -A 3 -B 1 "Anticodon: '+anticodon+'" trnascan/'+genome_accession+'_struc.txt > tempfiles/temp.txt'
     g2='grep -A 1 -m 1 "Seq" tempfiles/temp.txt > tempfiles/temp_seq.txt'
 
-    print(g1)
     os.system(g1)
     os.system(g2)
     
