@@ -10,6 +10,7 @@ import base64
 from Bio import Entrez
 from Bio import SeqIO
 from Bio.Seq import Seq
+from Bio.Alphabet import generic_rna
 
 import urllib.request
 
@@ -134,12 +135,58 @@ def add_thermocalc(predseq):
     predseq['deltadelta_g']=deltadeltaG
     
     return predseq
+
+def rc(codon):
+    scodon=Seq(codon,generic_rna)
+    rc_codon=str(scodon.reverse_complement())
+    rc_codon=rc_codon.upper()
+    return rc_codon
+
+def wobblepair(base1, base2):
+    base1 = base1.upper().replace('T','U')
+    base2 = base2.upper().replace('T','U')
+    if base1 == 'N' or base2 == 'N':
+        return True
+    if base1 == rc(base2):
+        return True
+    if base1 == 'G' and base2 == 'U':
+        return True
+    if base1 == 'U' and base2 == 'G':
+        return True
+    return False
+
+def clean(dot_structure, seq):
+    if pd.isna(dot_structure) or pd.isna(seq):
+        return None
+    str_clean = ['.']*len(dot_structure)
     
+    str_len = len(dot_structure)
+    
+    for i in range(str_len - 1):
+        if dot_structure[i] == '(':
+            l_count = 1 #counting the original '(' that we're looking for
+            for j in range(i+1, str_len):
+                if dot_structure[j] == '(':
+                    l_count += 1
+                if dot_structure[j] == ')':
+                    l_count -= 1
+                if l_count == 0: #We found the pair!
+                    if wobblepair(seq[i],seq[j]): #But is it good?
+                        str_clean[i] = '('
+                        str_clean[j] = ')'
+                    break
+    return "".join(str_clean) #Convert to string from list
+
+
 def clean_sequences(predseq):
     predseq["codon_region"]=predseq["codon_region"].str.upper()
     predseq["codon"]=predseq["codon"].str.upper()
     predseq["FASTA_sequence"]=predseq["FASTA_sequence"].str.upper()
     predseq["Name"]=predseq["Name"].str.replace('c','',regex=False)
+    
+    predseq[["Trimmed_antiterm_struct"]] = predseq.apply(lambda x: clean(x['Trimmed_antiterm_struct'], x['Trimmed_sequence']), axis = 'columns', result_type = 'expand')
+    predseq[["Trimmed_term_struct"]] = predseq.apply(lambda x: clean(x['Trimmed_term_struct'], x['Trimmed_sequence']), axis = 'columns', result_type = 'expand')
+    
     return predseq
 
 def clean_values(predseq):
@@ -157,11 +204,6 @@ def clean_values(predseq):
             pass
     
     return predseq
-
-def rc(codon):
-    scodon=Seq(codon,generic_rna)
-    rc_codon=str(scodon.reverse_complement())
-    return rc_codon
     
 def add_organism_and_taxid(predseq):
     

@@ -15,6 +15,14 @@ def rc(codon):
     scodon=Seq(codon,generic_rna)
     rc_codon=str(scodon.reverse_complement())
     return rc_codon
+    
+def add_CCA(seq, str):
+    seq = seq.strip()
+    str = str.strip()
+    if str[-5:] == "))))." or str[-5:] == ")))..":
+        str = str + '...'
+        seq = seq + 'CCA'
+    return seq, str
 
 def get_trna(genome_accession, codon):
     trna_file='trnascan/'+genome_accession+'_struc.txt'
@@ -35,7 +43,7 @@ def get_trna(genome_accession, codon):
     temp_seq=open('tempfiles/temp_seq.txt','r').read().split('Seq: ')[1]
     temp_str=open('tempfiles/temp_str.txt','r').read().split('Str: ')[1].replace('>','(').replace('<',')')
     
-    return temp_seq.strip(), temp_str.strip()
+    return add_CCA(temp_seq, temp_str)
     
 def check_trna_file(genome_accession):
     trna_file='trnascan/'+genome_accession+'_struc.txt'
