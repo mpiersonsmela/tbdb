@@ -174,9 +174,12 @@ def tbox_features(seq, struct, offset = 0):
     if len(antiterm_list) > 0:
         antiterm_start = antiterm_list[len(antiterm_list)-1] #Gets the last one
         discrim_start = struct.find('---', antiterm_start + 3) #Find the loop containing the discriminator
-        discrim = seq[discrim_start:discrim_start + 4]
+        discrim_end = discrim_start + 4
+        discrim = seq[discrim_start:discrim_end]
     else:
         antiterm_start = -1
+        discrim_start = -1
+        discrim_end = -1
         discrim = ""
         warnings += "NO_ANTITERM_START;"
     
@@ -205,7 +208,7 @@ def tbox_features(seq, struct, offset = 0):
     antiterm_end += offset
     
     #Return a tuple with the features identified
-    return (s1_start, s1_loop_start, s1_loop_end, codon, s1_end, antiterm_start, discrim, antiterm_end, codon_region, warnings)
+    return (s1_start, s1_loop_start, s1_loop_end, codon, s1_end, antiterm_start, discrim, antiterm_end, codon_region, warnings, discrim_start, discrim_end)
 
 #Convert between position in INFERNAL output and fasta sequence
 #Count the gaps and adjust for them
@@ -303,9 +306,12 @@ def tbox_derive(tboxes):
             aterm_start = int(tboxes['antiterm_start'][i])
             if aterm_start > 0:
                 tboxes.at[tboxes.index[i], 'antiterm_start'] = mapping[aterm_start]
-                #Calculate discriminator range
-                tboxes.at[tboxes.index[i], 'discrim_start'] = mapping[aterm_start + 4]
-                tboxes.at[tboxes.index[i], 'discrim_end'] = mapping[aterm_start + 7]
+            
+            #Calculate discriminator range
+            discrim_start = int(tboxes['discrim_start'][i])
+            if discrim_start > 0:
+                tboxes.at[tboxes.index[i], 'discrim_start'] = mapping[discrim_start]
+                tboxes.at[tboxes.index[i], 'discrim_end'] = mapping[discrim_start + 4]
 
             aterm_end = int(tboxes['antiterm_end'][i])
             if aterm_end > 0:
@@ -768,7 +774,7 @@ def run_thermo(tboxes):
     tboxes['folded_antiterm_structure'] = tboxes.apply(lambda x: get_whole_structs(x['antiterm_start'], x['whole_antiterm_structure'], x['vienna_antiterminator_structure'])[0], axis = 'columns', result_type = 'expand')
     print('Thermodynamic calculations complete.')
     return tboxes
-    
+
 #Generate trimmed structures and sequences
 def trim(seq_df):
     seq_df['Trimmed_sequence']=""
@@ -871,6 +877,8 @@ def tbox_predict(INFERNAL_file, predictions_file, fasta_file = None, score_cutof
         tbox_all_DF.at[tbox_all_DF.index[i], 'antiterm_end'] = tbox[7]
         tbox_all_DF.at[tbox_all_DF.index[i], 'codon_region'] = tbox[8]
         tbox_all_DF.at[tbox_all_DF.index[i], 'warnings'] += tbox[9]
+        tbox_all_DF.at[tbox_all_DF.index[i], 'discrim_start'] = tbox[10]
+        tbox_all_DF.at[tbox_all_DF.index[i], 'discrim_end'] += tbox[11]
         
         #Check the score
         if tbox_all_DF.at[tbox_all_DF.index[i], 'Score'] < score_cutoff:
