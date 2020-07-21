@@ -230,7 +230,7 @@ def tbox_derive(tboxes):
         seq = tboxes['Sequence'][i]
         if isinstance(seq, str): #sanity check. Skip NaN
             #Create mapping between INFERNAL sequence and FASTA sequence
-            mapping = map_fasta(seq, fasta, offset = 0)
+            mapping = map_fasta(seq, fasta, offset = tboxes['Tbox_start'][i] - 1)
             #Update the positions of existing features.
             s1_start = int(tboxes['s1_start'][i])
             if s1_start > 0:
@@ -260,9 +260,12 @@ def tbox_derive(tboxes):
             aterm_start = int(tboxes['antiterm_start'][i])
             if aterm_start > 0:
                 tboxes.at[tboxes.index[i], 'antiterm_start'] = mapping[aterm_start]
-                #Calculate discriminator range
-                tboxes.at[tboxes.index[i], 'discrim_start'] = mapping[aterm_start + 4]
-                tboxes.at[tboxes.index[i], 'discrim_end'] = mapping[aterm_start + 7]
+                
+            #Calculate discriminator range
+            discrim_start = int(tboxes['discrim_start'][i])
+            if discrim_start > 0:
+                tboxes.at[tboxes.index[i], 'discrim_start'] = mapping[discrim_start]
+                tboxes.at[tboxes.index[i], 'discrim_end'] = mapping[discrim_start + 4]
 
             aterm_end = int(tboxes['antiterm_end'][i])
             if aterm_end > 0:
@@ -280,7 +283,7 @@ def get_fold(sequence):
     energy = ""
     errors = ""
 
-    vienna_args = ['RNAfold', '-T', '37'] # arguments used to call RNAfold at 37 degrees
+    vienna_args = ['RNAfold', '--noPS', '-T', '37'] # arguments used to call RNAfold at 37 degrees
     vienna_input = str(sequence) # the input format
     vienna_call = subprocess.run(vienna_args, stdout = subprocess.PIPE, stderr = subprocess.PIPE, input = vienna_input, encoding = 'ascii')
     
@@ -300,7 +303,7 @@ def get_fold_constraints(sequence, structure):
     errors = ""
     structure_out = ""
 
-    vienna_args = ['RNAfold', '-T', '37', '-C'] # arguments used to call RNAfold at 37 degrees with constraints
+    vienna_args = ['RNAfold', '--noPS', '-T', '37', '-C'] # arguments used to call RNAfold at 37 degrees with constraints
     vienna_input = str(sequence) + '\n' + str(structure) # the input format
     vienna_call = subprocess.run(vienna_args, stdout = subprocess.PIPE, stderr = subprocess.PIPE, input = vienna_input, encoding = 'ascii')
     
@@ -332,7 +335,7 @@ def make_antiterm_constraints(sequence, structure):
         if(discriminator):
             constraints = constraints[:(discriminator.start() + match.start() + 1)] + 'xxxx' + constraints[(discriminator.end() + match.start() + 1):]
             structure_out, energy, errors = get_fold_constraints(sequence, constraints)
-            if structure_out[3] != '(': #check if base immediately before UGGN is paired
+            if len(structure_out) < 4 or structure_out[3] != '(': #check if base immediately before UGGN is paired
                 errors += "BAD_ANTITERM_STEM"
             return structure_out, energy, errors
     return None, None, None
