@@ -36,7 +36,7 @@ A script `init.sh` is provided to install them automatically using `conda`.
 
 You can also manually initialize by installing dependencies, then unzipping all '.tar.gz' files in the '/pipeline' subdirectory, and creating '/pipeline/tempfiles'
 
-Code was designed and tested on OSX 10.14; other Unix operating systems should also work but have not been tested.
+Code was designed and tested on macOS 10.14; other Unix operating systems should also work but have not been tested.
 
 ## Pipeline usage
 Place input .fa files in a target directory (for example, `/fasta`).
