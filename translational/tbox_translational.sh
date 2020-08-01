@@ -1,5 +1,5 @@
 #!/bin/bash
-#Runs feature predictions on isoleucyl translational T-boxes
+#Runs feature predictions on Class II T-boxes
 cm='translational_ILE.cm'
 name=$(echo "$1" | cut -f 1 -d '.')
 

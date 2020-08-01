@@ -23,6 +23,8 @@ def extract_from_accession(name):
 
 model1 = pd.read_csv(sys.argv[1])
 model2 = pd.read_csv(sys.argv[2])
+model2["Regulation"] = "Unknown"
+
 combined = [] #List of rows in output
 
 for i in range(len(model1)):
@@ -31,16 +33,22 @@ for i in range(len(model1)):
     for j in range(len(model2)):
         name2 = model2["Name"][j]
         if name1 == name2:  #overlap(name1, name2):
-            if (model1["Score"][i] < model2["Score"][j]) or (not pd.isna(model1["warnings"][i]) and "TRUNCATED_STEM_1" in model1["warnings"][i] and model2["Score"][j] > 30):
-                combined.append(model2.iloc[[j]])
-                print("Swapped " + name2)
-                include = False
+            if model2["Score"][j] > 30:
+                if (model1["Score"][i] < model2["Score"][j]) or (not pd.isna(model1["warnings"][i]) and "TRUNCATED_STEM_1" in model1["warnings"][i]):
+                    combined.append(model2.iloc[[j]])
+                    print(name2)
+                    include = False
             break
     if include:
         combined.append(model1.iloc[[i]])
 
 output = pd.concat(combined)
-print("Combined: " + str(len(output)))
+output.to_csv("check.csv", index = False)
+
+#print("Combined: " + str(len(output)))
 filtered = output.drop_duplicates(subset = "Sequence")
-print("Deduplicated: " + str(len(filtered)))
-filtered.to_csv(sys.argv[3])
+
+
+
+#print("Deduplicated: " + str(len(filtered)))
+filtered.to_csv(sys.argv[3], index = False)
