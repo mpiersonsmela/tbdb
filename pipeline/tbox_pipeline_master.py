@@ -206,6 +206,8 @@ def tbox_features(seq, struct, offset = 0):
     s1_end += offset
     antiterm_start += offset + 1
     antiterm_end += offset
+    discrim_start += offset
+    discrim_end += offset - 1
     
     #Return a tuple with the features identified
     return (s1_start, s1_loop_start, s1_loop_end, codon, s1_end, antiterm_start, discrim, antiterm_end, codon_region, warnings, discrim_start, discrim_end)
@@ -311,7 +313,7 @@ def tbox_derive(tboxes):
             discrim_start = int(tboxes['discrim_start'][i])
             if discrim_start > 0:
                 tboxes.at[tboxes.index[i], 'discrim_start'] = mapping[discrim_start]
-                tboxes.at[tboxes.index[i], 'discrim_end'] = mapping[discrim_start + 4]
+                tboxes.at[tboxes.index[i], 'discrim_end'] = mapping[discrim_start + 3] #+3 because inclusive
 
             aterm_end = int(tboxes['antiterm_end'][i])
             if aterm_end > 0:

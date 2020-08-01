@@ -18,8 +18,8 @@ import urllib.request
 #For more information see: https://www.ncbi.nlm.nih.gov/account/
 #You can also run without a key but this will be slower.
 
-Entrez.email = "YOUR_EMAIL" #Your email, required for Entrez
-Entrez.api_key = "YOUR_KEY" #Your API key
+Entrez.email = #Your email, required for Entrez
+Entrez.api_key =  #Your API key
 
 def add_accession(predseq):
     
@@ -237,19 +237,18 @@ def add_organism_and_taxid(predseq):
                 predseq.loc[pd.Index([i]),['TaxId','GBSeq_organism','phylum','class','order','family','genus']] = row.values[0,1:8]
             
             except IndexError: #not found in LUT
-
-                genome = Entrez.efetch(db="nucleotide", id=genome_accession, rettype="docsum", retmode="xml")
-                target_records = Entrez.read(genome)
-
-
-                taxid=target_records[0]['TaxId']
-
-
-                genome = Entrez.efetch(db="taxonomy", id=taxid, retmode="xml")
-
-                data = Entrez.read(genome)
-
                 try:
+                    genome = Entrez.efetch(db="nucleotide", id=genome_accession, rettype="docsum", retmode="xml")
+                    target_records = Entrez.read(genome)
+
+
+                    taxid=target_records[0]['TaxId']
+
+
+                    genome = Entrez.efetch(db="taxonomy", id=taxid, retmode="xml")
+
+                    data = Entrez.read(genome)
+                
                 #Initialize empty 
                     tax_phylum = 'NA'
                     tax_class = 'NA'
@@ -334,21 +333,21 @@ def add_dsgene(predseq):
         if pd.isna(predseq['downstream_protein'].iloc[i]):
             #Get required fields from input file
             genome_accession=(predseq['Name'].iloc[i])[0:((predseq['Name'].iloc[i]).find('.',0,-1))]
-            locus_s=(predseq['locus_start'].iloc[i])
-            locus_e=(predseq['locus_end'].iloc[i])
+            locus_s=int(predseq['locus_start'].iloc[i])
+            locus_e=int(predseq['locus_end'].iloc[i])
             
             try:
-                row = dsgeneLUT.loc[(dsgeneLUT['accession_name'] == genome_accession) & (dsgeneLUT['locus_start'] == int(locus_s)) & (dsgeneLUT['locus_end'] == int(locus_e))]
+                row = dsgeneLUT.loc[(dsgeneLUT['accession_name'] == genome_accession) & (dsgeneLUT['locus_start'] == locus_s) & (dsgeneLUT['locus_end'] == locus_e)]
                 predseq.loc[pd.Index([i]),['downstream_protein','downstream_protein_id','downstream_protein_EC']] = row.values[0,3:6]
                 #print("found LUT " + genome_accession)
             
             except IndexError:#KeyError: #not found in LUT
                 if locus_s<locus_e:
-                    chr_s = str(int(locus_e)) #Start at end of Tbox
-                    chr_e = str(int(locus_e) + 500) #500 bp after end of Tbox
+                    chr_s = str(locus_e) #Start at end of Tbox
+                    chr_e = str(locus_e + 500) #500 bp after end of Tbox
                 if locus_s>locus_e:
-                    chr_s = str(int(locus_e) - 500)
-                    chr_e = str(int(locus_e))  #end 500bp before, maybe dont care about strand here
+                    chr_s = str(locus_e - 500)
+                    chr_e = str(locus_e)  #end 500bp before, maybe dont care about strand here
             
                 handle = Entrez.efetch(db="nuccore", rettype = "ft", id =  genome_accession, seq_start = chr_s, seq_stop = chr_e)
                 data = handle.readlines()
@@ -481,7 +480,7 @@ def add_gene_desc(predseq):
                 
                 print('Progress adding protein descriptions: '+str(i)+' of '+str(len(predseq)))
                 print(protein_desc)
-                predseq['protein_desc'].iloc[i] = protein_desc
+                predseq['protein_desc'].iloc[i] = protein_desc.strip()
                 
 
     proteinLUT.to_csv(LUTfile, index = False, header = True)
